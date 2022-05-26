@@ -25,7 +25,7 @@
 
   <div class="container mt-3">
     <div class="input-group mb-3">
-      <input type="text" class="form-control" placeholder="Enter your monthly income" />
+      <input type="text" id="incomeInput" class="form-control" placeholder="Enter your monthly income" />
       <div class="input-group-append">
         <button class="btn btn-outline-dark btn-md" id="submitbtn">
           submit
@@ -59,7 +59,8 @@
   <script type="module">
     //***********************GET TABLE DATA******************************//
     var stdNo = 0;
-    var tbody = document.getElementById("tbody1")
+    var tbody = document.getElementById("tbody1");
+    let subBtn = document.getElementById("submitbtn");
     function AddItemToTable(date, income, taxed, leftover) {
       let trow = document.createElement("tr");
       let td1 = document.createElement("td");
@@ -90,6 +91,25 @@
         AddItemToTable(element.date, element.amount, element.taxed, element.leftover);
       })
     }
+
+    function submitIncome(){
+      const taxRate = .153;
+      const ssNumber = .124;
+      const medicare = .029;
+      let incomeVal = document.getElementById("incomeInput").value;
+
+      var today = new Date();
+      var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+
+      let taxedVal = Math.round(incomeVal*taxRate);
+
+      let leftVal = incomeVal-taxedVal;
+
+      addDocument_AutoID(date, incomeVal, taxedVal, leftVal);
+    }
+
+    subBtn.addEventListener("click", submitIncome);
+
     //***********************FIREBASE******************************//
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-app.js";
@@ -132,6 +152,26 @@
         });
     });
 
+    //ADD DATA TO FIRESTORE
+    async function addDocument_AutoID(dateT, incomeAmt, taxedAmt, leftAmt){
+      var ref = collection(db, "Income");
+
+      const docRef = await addDoc(
+        ref, {
+          amount: incomeAmt,
+          date: dateT,
+          taxed: taxedAmt,
+          leftover: leftAmt
+        }
+      )
+      .then(() => {
+        alert("Data added successfully");
+      })
+      .catch((error) => {
+        alert("Uncessful operation, error:" + error);
+      })
+    }
+
     //GET REAL TIME DATA
     async function getAllDataRealTime() {
       const dbRef = collection(db, "Income");
@@ -145,8 +185,13 @@
       })
     }
 
-    window.onload = getAllDataRealTime;
+    onAuthStateChanged(auth, (user) =>{
+      if(user){
+        getAllDataRealTime;
+      }
+    })
 
   </script>
 </body>
+
 </html>
