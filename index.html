@@ -91,7 +91,8 @@
         AddItemToTable(element.date, element.amount, element.taxed, element.leftover);
       })
     }
-
+    //This function takes in the submitted income value and calculate the taxed amount and then call addDocument_AutoID which will
+    //add the data to firebase firestore
     function submitIncome(){
       const taxRate = .153;
       const ssNumber = .124;
@@ -107,10 +108,10 @@
 
       addDocument_AutoID(date, incomeVal, taxedVal, leftVal);
     }
-
+    //Wait for user to submit their income
     subBtn.addEventListener("click", submitIncome);
 
-    //***********************FIREBASE******************************//
+    //*******************************FIREBASE****(****************************//
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-app.js";
     import {
